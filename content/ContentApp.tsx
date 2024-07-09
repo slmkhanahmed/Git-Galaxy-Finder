@@ -1,7 +1,6 @@
 import React from 'react'
-
-import'./content.css'
 import { Box, FormControl, TextInput } from '@primer/react'
+import './content.css'
 export default function ContentApp() {
 
 
@@ -16,8 +15,3 @@ export default function ContentApp() {
     </div>
   )
 }
-//https://primer.style/react/storybook/?path=/story/components-actionmenu-features--single-select&globals=colorScheme:light
-//https://primer.style/react/storybook/?path=/story/components-actionmenu-examples--custom-overlay-props&globals=colorScheme:light
-//https://primer.style/react/storybook/?path=/story/components-anchoredoverlay--playground&globals=colorScheme:light
-//https://primer.style/react/storybook/?path=/story/components-button--default&globals=colorScheme:light
-//https://primer.style/react/storybook/?path=/story/components-filteredsearch--default&globals=colorScheme:light
