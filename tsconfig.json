@@ -1,0 +1,44 @@
+{
+    "compilerOptions": {
+        "strict": true,
+        "forceConsistentCasingInFileNames": true,
+        "lib": [
+            "es6",
+            "es2019",
+            "dom",
+            "dom.iterable"
+        ],
+        "baseUrl": ".",
+        "paths": {
+            "@utils/*": [
+                "./src/utils/*"
+            ],
+            "@components/*": [
+                "./src/components/*"
+            ],
+            "@assets/*": [
+                "./src/assets/*"
+            ]
+        },
+        "outDir": "./dist/",
+        "noImplicitAny": true,
+        "allowSyntheticDefaultImports": true,
+        "strictNullChecks": true,
+        "module": "ESNext",
+        "target": "ESNext",
+        "jsx": "preserve", // Will be compiled with Babel anyway
+        "allowJs": true,
+        "moduleResolution": "node",
+        "esModuleInterop": true,
+        "resolveJsonModule": true
+    },
+    "ts-node": {
+        "compilerOptions": {
+            "module": "CommonJS"
+        },
+        "files": true,
+        "include": [
+            "declarations.d.ts"
+        ]
+    }
+}
