@@ -4,3 +4,7 @@
   position: absolute;
   height: 44cm;
 }
+
+.search {
+  z-index: 2;
+}

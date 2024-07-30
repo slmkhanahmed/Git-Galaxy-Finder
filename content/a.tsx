@@ -1,5 +1,4 @@
 const currentUrl = window.location.href;
-console.log(currentUrl);
 
 async function fetchAndParseAllPages() {
     const urlPattern = /https:\/\/github.com\/stars\/.*\/lists\/.*/;
@@ -87,4 +86,3 @@ async function fetchAndParseAllPages() {
 }
 
 fetchAndParseAllPages();
-
