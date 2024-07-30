@@ -1,55 +1,72 @@
 const currentUrl = window.location.href;
 console.log(currentUrl);
 
-async function fetchAndParse() {
+async function fetchAndParseAllPages() {
     const urlPattern = /https:\/\/github.com\/stars\/.*\/lists\/.*/;
 
     if (urlPattern.test(currentUrl)) {
         try {
-            // Fetch the HTML from the current URL
-            const response = await fetch(currentUrl);
-            const text = await response.text();
+            // Fetch the HTML from the first page to determine the total number of repositories
+            let response = await fetch(currentUrl);
+            let text = await response.text();
 
             // Parse the HTML using DOMParser
-            const parser = new DOMParser();
-            const dom = parser.parseFromString(text, 'text/html');
+            let parser = new DOMParser();
+            let dom = parser.parseFromString(text, 'text/html');
 
             // Select elements and extract information
-            const elements = dom.querySelectorAll('.mb-1 a, .pr-4, .my-3 .color-fg-muted');
-            const arr = Array.from(elements);
-
-            // Extract href and text from the elements
-            const results = arr.map(e => {
-                if (e instanceof HTMLAnchorElement) {
-                    return {
-                        type: 'link',
-                        text: e.innerText,
-                        href: e.href
-                    };
-                } else {
-                    return {
-                        type: 'text',
-                        text: e.textContent?.trim() || ''
-                    };
-                }
-            }).filter(result => result.text); // Filter out elements with empty text
+            let elements = dom.querySelectorAll('.mb-1 a, .pr-4, .my-3 .color-fg-muted');
+            let arr = Array.from(elements);
 
             // Extract the number of repositories from the first text object
             let repoCount = 0;
-            if (results.length > 0 && results[0].type === 'text') {
-                const repoText = results[0].text;
+            if (arr.length > 0) {
+                const repoText = arr[0].textContent?.trim() || '';
                 const repoMatch = repoText.match(/(\d+)\s+repositories/i);
                 if (repoMatch) {
-                repoCount = parseInt(repoMatch[1]);
+                    repoCount = parseInt(repoMatch[1].replace(/\./g, ''), 10);
                 }
             }
 
-            // Determine the number of pages required to display all repositories
-            let pages = Math.floor(repoCount / 20);
-            if (repoCount % 20 !== 0) pages += 1;
+            // Determine the total number of pages
+            let totalPages = Math.ceil(repoCount / 30);
+
+            // Initialize an array to store all results
+            let allResults = [];
+
+            // Loop through each page and extract data
+            for (let page = 1; page <= totalPages; page++) {
+                const pageUrl = `${currentUrl}?page=${page}`;
+                response = await fetch(pageUrl);
+                text = await response.text();
+                dom = parser.parseFromString(text, 'text/html');
+                elements = dom.querySelectorAll('.mb-1 a, .pr-4, .my-3 .color-fg-muted');
+                arr = Array.from(elements);
+
+                const results = arr.map(e => {
+                    if (e instanceof HTMLAnchorElement) {
+                        return {
+                            type: 'link',
+                            text: e.innerText,
+                            href: e.href
+                        };
+                    } else {
+                        return {
+                            type: 'text',
+                            text: e.textContent?.trim() || ''
+                        };
+                    }
+                }).filter(result => result.text); // Filter out elements with empty text
+
+                // Append the results of the current page to allResults
+                allResults = allResults.concat(results);
+            }
+
+            // Store all results in local storage in JSON format
+            localStorage.setItem('githubLinks', JSON.stringify(allResults));
 
             // Print results to console
-            results.forEach(result => {
+            allResults.forEach(result => {
                 if (result.type === 'link') {
                     console.log(`Link: ${result.href} - ${result.text}`);
                 } else {
@@ -57,12 +74,10 @@ async function fetchAndParse() {
                 }
             });
 
-            // Store results in local storage in JSON format
-            localStorage.setItem('githubLinks', JSON.stringify(results));
-            console.log(`Repository count: ${repoCount}`);
-            console.log(`Total pages needed: ${pages}`);
+            console.log(`Total repository count: ${repoCount}`);
+            console.log(`Total pages processed: ${totalPages}`);
 
-            return { results, repoCount, pages };
+            return { allResults, repoCount, totalPages };
         } catch (error) {
             console.error('Fetch error:', error);
         }
@@ -71,4 +86,4 @@ async function fetchAndParse() {
     }
 }
 
-fetchAndParse();
+fetchAndParseAllPages();
