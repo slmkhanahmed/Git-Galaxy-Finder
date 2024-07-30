@@ -6,8 +6,8 @@ async function fetchAndParse() {
 
     if (urlPattern.test(currentUrl)) {
         try {
-            // Fetch the HTML from the specified URL
-            const response = await fetch('https://github.com/stars/adnahmed/lists/tools?page=19');
+            // Fetch the HTML from the current URL
+            const response = await fetch(currentUrl);
             const text = await response.text();
 
             // Parse the HTML using DOMParser
@@ -40,9 +40,13 @@ async function fetchAndParse() {
                 const repoText = results[0].text;
                 const repoMatch = repoText.match(/(\d+)\s+repositories/i);
                 if (repoMatch) {
-                    repoCount = parseInt(repoMatch[1].replace(/\./g, ''), 10) + 1;
+                repoCount = parseInt(repoMatch[1]);
                 }
             }
+
+            // Determine the number of pages required to display all repositories
+            let pages = Math.floor(repoCount / 20);
+            if (repoCount % 20 !== 0) pages += 1;
 
             // Print results to console
             results.forEach(result => {
@@ -56,8 +60,9 @@ async function fetchAndParse() {
             // Store results in local storage in JSON format
             localStorage.setItem('githubLinks', JSON.stringify(results));
             console.log(`Repository count: ${repoCount}`);
+            console.log(`Total pages needed: ${pages}`);
 
-            return { results, repoCount };
+            return { results, repoCount, pages };
         } catch (error) {
             console.error('Fetch error:', error);
         }
