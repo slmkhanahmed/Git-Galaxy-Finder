@@ -34,6 +34,16 @@ async function fetchAndParse() {
                 }
             }).filter(result => result.text); // Filter out elements with empty text
 
+            // Extract the number of repositories from the first text object
+            let repoCount = 0;
+            if (results.length > 0 && results[0].type === 'text') {
+                const repoText = results[0].text;
+                const repoMatch = repoText.match(/(\d+)\s+repositories/i);
+                if (repoMatch) {
+                    repoCount = parseInt(repoMatch[1].replace(/\./g, ''), 10) + 1;
+                }
+            }
+
             // Print results to console
             results.forEach(result => {
                 if (result.type === 'link') {
@@ -45,8 +55,9 @@ async function fetchAndParse() {
 
             // Store results in local storage in JSON format
             localStorage.setItem('githubLinks', JSON.stringify(results));
+            console.log(`Repository count: ${repoCount}`);
 
-            return results;
+            return { results, repoCount };
         } catch (error) {
             console.error('Fetch error:', error);
         }
@@ -56,4 +67,3 @@ async function fetchAndParse() {
 }
 
 fetchAndParse();
-console.log(localStorage.githubLinks);
