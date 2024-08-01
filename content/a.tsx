@@ -31,7 +31,7 @@ async function fetchAndParseAllPages() {
             let totalPages = Math.ceil(repoCount / 30);
 
             // Initialize an array to store all results
-            let allResults = [];
+            let allResults: any[] = [];
 
             // Loop through each page and extract data
             for (let page = 1; page <= totalPages; page++) {

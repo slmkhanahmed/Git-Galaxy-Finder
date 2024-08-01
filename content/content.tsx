@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client'
 import ContentApp from './ContentApp'
 
 setTimeout(initial, 1000)
-
+localStorage.clear();
 function initial() {
   // Create a new div element and append it to the document's body
   // document.body.appendChild(rootDiv)
