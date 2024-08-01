@@ -13,9 +13,6 @@ function initial() {
   const rootDiv = document.createElement('div');
   const root = ReactDOM.createRoot(rootDiv);
  
-  // m1:
-  // const beforeSearch = document.querySelector('adadad');
-  // m2: 
   const xeval = new XPathEvaluator();
   const res = xeval.evaluate(`//\*[@id="user-list-repositories"]`, document.body);
   const beforeSearch = res.iterateNext()

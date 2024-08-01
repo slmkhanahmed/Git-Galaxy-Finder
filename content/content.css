@@ -3,6 +3,8 @@
   width: 25cm;
   position: absolute;
   height: 44cm;
+  background-color: blue;
+  z-index: 2;
 }
 
 .search {
