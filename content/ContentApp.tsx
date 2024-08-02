@@ -74,6 +74,7 @@ export default function ContentApp() {
       <form id='searchstar' onSubmit={(e) => e.preventDefault()}>
         <label hidden htmlFor="search">Search:</label>
         <input
+          id="search"
           placeholder='Search Stars Repo'
           type="search"
           value={searchQuery}

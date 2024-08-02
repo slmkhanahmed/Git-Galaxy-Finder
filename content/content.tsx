@@ -21,7 +21,7 @@ function initial() {
   const root = ReactDOM.createRoot(rootDiv);
  
   const xeval = new XPathEvaluator();
-  const res = xeval.evaluate(`//\*[@id="user-list-repositories"]`, document.body);
+  const res = xeval.evaluate(`//*[@id="user-list-repositories"]`, document.body);
   const beforeSearch = res.iterateNext()
   const beforeSearchParent = beforeSearch?.parentNode;
 // beforeSearch?.insertBefore(rootDiv);
