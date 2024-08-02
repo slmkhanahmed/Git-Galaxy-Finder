@@ -60,6 +60,11 @@ async function fetchAndParseAllPages() {
                         let elements = dom.querySelectorAll('.mb-1 a, .pr-4, .my-3 .color-fg-muted');
                         let arr = Array.from(elements);
 
+                        // Ignore the first text element for pages other than the first
+                        if (page > 1 && arr.length > 0) {
+                            arr.shift();
+                        }
+
                         return arr.map(e => {
                             if (e instanceof HTMLAnchorElement) {
                                 return {
