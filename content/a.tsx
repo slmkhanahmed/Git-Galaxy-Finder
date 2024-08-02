@@ -92,15 +92,6 @@ async function fetchAndParseAllPages() {
             // Store all results in local storage in JSON format
             localStorage.setItem('githubLinks', JSON.stringify(allResults));
 
-            // Print results to console
-            allResults.forEach(result => {
-                if (result.type === 'link') {
-                    console.log(`Link: ${result.href} - ${result.text}`);
-                } else {
-                    console.log(`Text: ${result.text}`);
-                }
-            });
-
             console.log(`Total repository count: ${repoCount}`);
             console.log(`Total pages processed: ${totalPages}`);
 

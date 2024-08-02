@@ -3,7 +3,14 @@ import ReactDOM from 'react-dom/client'
 import ContentApp from './ContentApp'
 
 setTimeout(initial, 1000)
-localStorage.clear();
+const currentUrl = window.location.href;
+  const savedUrl = localStorage.getItem('lastVisitedUrl');
+
+  // Check if lastVisitedUrl exists and if the URL has changed; if not, retain local storage
+  if (savedUrl !== currentUrl) {
+    localStorage.removeItem('githubLinks');
+    localStorage.setItem('lastVisitedUrl', currentUrl);
+  }
 function initial() {
   // Create a new div element and append it to the document's body
   // document.body.appendChild(rootDiv)
