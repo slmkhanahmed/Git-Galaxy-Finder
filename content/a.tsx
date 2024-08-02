@@ -31,35 +31,41 @@ async function fetchAndParseAllPages() {
             let totalPages = Math.ceil(repoCount / 30);
 
             // Initialize an array to store all results
-            let allResults: any[] = [];
+            let allResults = [];
 
-            // Loop through each page and extract data
+            // Create an array of promises to fetch all pages
+            let pagePromises = [];
             for (let page = 1; page <= totalPages; page++) {
                 const pageUrl = `${currentUrl}?page=${page}`;
-                response = await fetch(pageUrl);
-                text = await response.text();
-                dom = parser.parseFromString(text, 'text/html');
-                elements = dom.querySelectorAll('.mb-1 a, .pr-4, .my-3 .color-fg-muted');
-                arr = Array.from(elements);
+                pagePromises.push(
+                    fetch(pageUrl).then(response => response.text()).then(text => {
+                        let dom = parser.parseFromString(text, 'text/html');
+                        let elements = dom.querySelectorAll('.mb-1 a, .pr-4, .my-3 .color-fg-muted');
+                        let arr = Array.from(elements);
 
-                const results = arr.map(e => {
-                    if (e instanceof HTMLAnchorElement) {
-                        return {
-                            type: 'link',
-                            text: e.innerText,
-                            href: e.href
-                        };
-                    } else {
-                        return {
-                            type: 'text',
-                            text: e.textContent?.trim() || ''
-                        };
-                    }
-                }).filter(result => result.text); // Filter out elements with empty text
-
-                // Append the results of the current page to allResults
-                allResults = allResults.concat(results);
+                        return arr.map(e => {
+                            if (e instanceof HTMLAnchorElement) {
+                                return {
+                                    type: 'link',
+                                    text: e.innerText,
+                                    href: e.href
+                                };
+                            } else {
+                                return {
+                                    type: 'text',
+                                    text: e.textContent?.trim() || ''
+                                };
+                            }
+                        }).filter(result => result.text); // Filter out elements with empty text
+                    })
+                );
             }
+
+            // Wait for all promises to resolve
+            let pageResults = await Promise.all(pagePromises);
+
+            // Flatten the results and store in allResults
+            allResults = pageResults.flat();
 
             // Store all results in local storage in JSON format
             localStorage.setItem('githubLinks', JSON.stringify(allResults));

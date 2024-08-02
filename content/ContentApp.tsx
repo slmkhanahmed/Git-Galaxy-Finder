@@ -3,7 +3,7 @@ import './content.css';
 import './a.tsx';
 
 // Polling interval in milliseconds
-const POLLING_INTERVAL = 3000;
+const POLLING_INTERVAL = 1000;
 
 export default function ContentApp() {
   const [searchQuery, setSearchQuery] = useState('');
