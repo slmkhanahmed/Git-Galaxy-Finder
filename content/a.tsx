@@ -1,14 +1,31 @@
 const currentUrl = window.location.href;
 
+async function fetchWithRetry(url, options = {}, retries = 3, backoff = 3000) {
+    for (let i = 0; i < retries; i++) {
+        try {
+            let response = await fetch(url, options);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            return await response.text();
+        } catch (error) {
+            console.error(`Fetch error on attempt ${i + 1} for URL: ${url}`, error);
+            if (i < retries - 1) {
+                console.log(`Retrying in ${backoff / 1000} seconds...`);
+                await new Promise(resolve => setTimeout(resolve, backoff));
+            } else {
+                throw error;
+            }
+        }
+    }
+}
+
 async function fetchAndParseAllPages() {
     const urlPattern = /https:\/\/github.com\/stars\/.*\/lists\/.*/;
 
     if (urlPattern.test(currentUrl)) {
         try {
             // Fetch the HTML from the first page to determine the total number of repositories
-            let response = await fetch(currentUrl);
-            let text = await response.text();
-
+            let text = await fetchWithRetry(currentUrl);
+            
             // Parse the HTML using DOMParser
             let parser = new DOMParser();
             let dom = parser.parseFromString(text, 'text/html');
@@ -38,7 +55,7 @@ async function fetchAndParseAllPages() {
             for (let page = 1; page <= totalPages; page++) {
                 const pageUrl = `${currentUrl}?page=${page}`;
                 pagePromises.push(
-                    fetch(pageUrl).then(response => response.text()).then(text => {
+                    fetchWithRetry(pageUrl).then(text => {
                         let dom = parser.parseFromString(text, 'text/html');
                         let elements = dom.querySelectorAll('.mb-1 a, .pr-4, .my-3 .color-fg-muted');
                         let arr = Array.from(elements);
