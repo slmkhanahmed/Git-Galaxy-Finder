@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import './content.css';
 import './a.tsx';
 
-// Polling interval in milliseconds
 const POLLING_INTERVAL = 1000;
 
 export default function ContentApp() {
@@ -22,7 +21,7 @@ export default function ContentApp() {
         setRepos(storedRepos);
         setDataLoaded(true);
         setDataNotAvailable(false);
-        setPolling(false); // Stop polling
+        setPolling(false);
       } else {
         setDataNotAvailable(true);
       }
@@ -32,25 +31,21 @@ export default function ContentApp() {
       }
     };
 
-    // Initial data check
     checkData();
 
-    // Set up polling to check for data availability
     const intervalId = setInterval(() => {
       if (polling) {
         checkData();
       } else {
-        clearInterval(intervalId); // Clear interval when data is loaded
+        clearInterval(intervalId);
       }
     }, POLLING_INTERVAL);
 
-    // Clean up interval on component unmount
     return () => clearInterval(intervalId);
   }, [polling]);
 
   useEffect(() => {
     if (dataLoaded && searchQuery) {
-      // Filter the repos based on the search query
       const lowerCaseQuery = searchQuery.toLowerCase();
       const filtered = repos.filter(repo =>
         (repo.text && repo.text.toLowerCase().includes(lowerCaseQuery)) ||
@@ -58,14 +53,13 @@ export default function ContentApp() {
       );
       setFilteredRepos(filtered);
     } else if (dataLoaded) {
-      setFilteredRepos([]); // Clear the display if search query is empty
+      setFilteredRepos([]);
     }
   }, [searchQuery, repos, dataLoaded]);
 
   const handleSearchChange = (e) => {
     const query = e.target.value;
     setSearchQuery(query);
-    // Save the search query to localStorage
     localStorage.setItem('searchQuery', query);
   };
 
@@ -79,7 +73,7 @@ export default function ContentApp() {
           type="search"
           value={searchQuery}
           onChange={handleSearchChange}
-          disabled={!dataLoaded} // Disable input if data is not loaded
+          disabled={!dataLoaded}
         />
         <button type="submit" disabled={!dataLoaded}>Search</button>
       </form>
@@ -88,7 +82,6 @@ export default function ContentApp() {
         <p>No data available in localStorage. Please ensure that 'githubLinks' data is stored correctly.</p>
       ) : (
         <>
-          {/* Hide the repos div if there is no search query or data is not loaded */}
           {dataLoaded && searchQuery && filteredRepos.length > 0 && (
             <div className='repos'>
               {filteredRepos.map((repo, index) => (

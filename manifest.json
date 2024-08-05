@@ -22,7 +22,9 @@
   "content_scripts": [
     {
       "matches": [
-        "https://github.com/stars/*/lists/*"
+        "https://github.com/stars/*/lists/*",
+        "https://github.com/*?tab=stars",
+        "https://github.com/*/*"
       ],
       "js": [
         "./content/content.tsx"
