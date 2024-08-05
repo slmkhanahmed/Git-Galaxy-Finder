@@ -2,7 +2,8 @@
   border: 1px solid #000;
   width: 25cm;
   position: absolute;
-  height: 44cm;
+  height: auto;
+  min-height: 44cm;
   background-color: blue;
   z-index: 2;
 }
