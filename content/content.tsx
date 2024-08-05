@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import ContentApp from './ContentApp';
+import './a.tsx';
 
 // Function to get the current URL
 function getCurrentPath() {
@@ -10,16 +11,22 @@ function getCurrentPath() {
 // Function to initialize or reinitialize the extension logic
 function initial() {
   const currentUrl = getCurrentPath();
+  const lastVisitedUrl = localStorage.getItem('lastVisitedUrl');
 
   // Define the URL pattern to match
   const urlPattern = /https:\/\/github.com\/stars\/.*\/lists\/.*/;
 
-  // Only manage local storage if the URL matches the pattern
-  if (urlPattern.test(currentUrl)) {
-    // Clear local storage if the URL matches the pattern
+  // Remove local storage data if lastVisitedUrl matches the pattern but currentUrl does not
+  if (lastVisitedUrl && urlPattern.test(lastVisitedUrl) && !urlPattern.test(currentUrl)) {
     localStorage.removeItem('githubLinks');
-    localStorage.setItem('lastVisitedUrl', currentUrl);
   }
+  
+  // Update lastVisitedUrl to the current URL if it matches the pattern
+  if (urlPattern.test(currentUrl)) {
+    localStorage.setItem('lastVisitedUrl', currentUrl);
+    fetchAndParseAllPages();
+  }
+
 
   // Create a new div element and append it to the document's body
   const rootDiv = document.createElement('div');
