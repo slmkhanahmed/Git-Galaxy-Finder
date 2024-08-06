@@ -88,23 +88,25 @@ async function fetchAndParseAllPages() {
     }
 }
 
-fetchAndParseAllPages();
 
 function getCurrentPath() {
   return window.location.href;
 }
 
-function initial() {
+ function initial() {
   const currentUrl = getCurrentPath();
-  const lastVisitedUrl = localStorage.getItem('lastVisitedUrl');
-
+  const savedUrl = localStorage.getItem('lastVisitedUrl');
   const urlPattern = /https:\/\/github.com\/stars\/.*\/lists\/.*/;
 
-  if (lastVisitedUrl && urlPattern.test(lastVisitedUrl) && !urlPattern.test(currentUrl)) {
-    localStorage.removeItem('githubLinks');
-  }
-
+  // If the current URL matches the pattern
   if (urlPattern.test(currentUrl)) {
+    // Check if the saved URL is different and matches the pattern
+    if (savedUrl && savedUrl !== currentUrl) {
+      // Clear data if saved URL matches the pattern and is different from current URL
+      localStorage.removeItem('githubLinks');
+    }
+
+    // Save the new URL as it matches the pattern
     localStorage.setItem('lastVisitedUrl', currentUrl);
     fetchAndParseAllPages(); // Re-fetch data for the new URL
   }
@@ -141,13 +143,7 @@ function observeUrlChanges() {
 
   observer.observe(document.body, { childList: true, subtree: true });
 
-  window.addEventListener('popstate', () => {
-    const newUrl = getCurrentPath();
-    if (newUrl !== lastUrl) {
-      lastUrl = newUrl;
-      initial();
-    }
-  });
+
 }
 
 setTimeout(initial, 1000);
