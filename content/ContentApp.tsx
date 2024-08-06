@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import './content.css';
-import './a.tsx';
 
 const POLLING_INTERVAL = 1000;
 
