@@ -103,10 +103,8 @@ function getCurrentPath() {
     localStorage.setItem('lastVisitedUrl', currentUrl);
     fetchAndParseAllPages(); // Re-fetch data for the new URL
   } else return null;
-
   const rootDiv = document.createElement('div');
   rootDiv.id = 'my-extension-root';
-
   const root = ReactDOM.createRoot(rootDiv);
 
   const xeval = new XPathEvaluator();
@@ -114,10 +112,9 @@ function getCurrentPath() {
   const beforeSearch = res.iterateNext();
   const beforeSearchParent = beforeSearch?.parentNode;
 
-   
+  if (beforeSearchParent) {
     beforeSearchParent.insertBefore(rootDiv, beforeSearch);
-  
-
+  } 
   root.render(<ContentApp />);
 }
 
