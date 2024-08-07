@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import ContentApp from './ContentApp';
 
+const urlPattern = /https:\/\/github.com\/stars\/.*\/lists\/.*/;
 async function fetchWithRetry(url, options = {}, retries = 3, backoff = 3000) {
     for (let i = 0; i < retries; i++) {
         try {
@@ -22,7 +23,6 @@ async function fetchWithRetry(url, options = {}, retries = 3, backoff = 3000) {
 
 async function fetchAndParseAllPages() {
     const currentUrl = window.location.href; // Ensure current URL is up-to-date
-    const urlPattern = /https:\/\/github.com\/stars\/.*\/lists\/.*/;
 
     if (urlPattern.test(currentUrl)) {
         try {
@@ -96,8 +96,6 @@ function getCurrentPath() {
  function initial() {
   const currentUrl = getCurrentPath();
   const savedUrl = localStorage.getItem('lastVisitedUrl');
-  const urlPattern = /https:\/\/github.com\/stars\/.*\/lists\/.*/;
-
   // If the current URL matches the pattern
   if (urlPattern.test(currentUrl)) {
     // Check if the saved URL is different and matches the pattern
@@ -109,7 +107,7 @@ function getCurrentPath() {
     // Save the new URL as it matches the pattern
     localStorage.setItem('lastVisitedUrl', currentUrl);
     fetchAndParseAllPages(); // Re-fetch data for the new URL
-  }
+  } else return null;
 
   const rootDiv = document.createElement('div');
   rootDiv.id = 'my-extension-root';
@@ -121,30 +119,33 @@ function getCurrentPath() {
   const beforeSearch = res.iterateNext();
   const beforeSearchParent = beforeSearch?.parentNode;
 
-  if (beforeSearchParent) {
+   
     beforeSearchParent.insertBefore(rootDiv, beforeSearch);
-  } else {
-    document.body.appendChild(rootDiv);
-  }
+  
 
   root.render(<ContentApp />);
 }
 
 function observeUrlChanges() {
-  let lastUrl = getCurrentPath();
+    let lastUrl = getCurrentPath();
+  
+    const observer = new MutationObserver(() => {
+      const newUrl = getCurrentPath();
+      if (newUrl !== lastUrl) {
+        lastUrl = newUrl;
+        if (urlPattern.test(newUrl)) {
+          initial();
+        } else {
+          console.log("URL does not match pattern, skipping initialization.");
+        }
+      }
+    });
+  
+    observer.observe(document.body, { childList: true, subtree: true });
+  }
 
-  const observer = new MutationObserver(() => {
-    const newUrl = getCurrentPath();
-    if (newUrl !== lastUrl) {
-      lastUrl = newUrl;
-      initial();
-    }
-  });
-
-  observer.observe(document.body, { childList: true, subtree: true });
 
 
-}
 
 setTimeout(initial, 1000);
 observeUrlChanges();

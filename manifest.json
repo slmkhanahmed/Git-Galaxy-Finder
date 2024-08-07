@@ -23,8 +23,7 @@
     {
       "matches": [
         "https://github.com/stars/*/lists/*",
-        "https://github.com/*?tab=stars",
-        "https://github.com/*/*"
+        "https://github.com/*?tab=stars"
       ],
       "js": [
         "./content/content.tsx"
