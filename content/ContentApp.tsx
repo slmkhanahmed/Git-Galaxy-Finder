@@ -46,10 +46,18 @@ export default function ContentApp() {
   useEffect(() => {
     if (dataLoaded && searchQuery) {
       const lowerCaseQuery = searchQuery.toLowerCase();
-      const filtered = repos.filter(repo =>
-        (repo.text && repo.text.toLowerCase().includes(lowerCaseQuery)) ||
-        (repo.type === 'link' && repo.href && repo.href.toLowerCase().includes(lowerCaseQuery))
-      );
+      const filtered = [];
+      for (let i = 0; i < repos.length; i++) {
+        const linkText = repos[i].type === 'link' ? repos[i].text.toLowerCase() : '';
+        const descriptionText = repos[i + 1] && repos[i + 1].type === 'text' ? repos[i + 1].text.toLowerCase() : '';
+
+        if (linkText.includes(lowerCaseQuery) || descriptionText.includes(lowerCaseQuery)) {
+          filtered.push({
+            link: repos[i],
+            description: descriptionText ? repos[i + 1].text : ''
+          });
+        }
+      }
       setFilteredRepos(filtered);
     } else if (dataLoaded) {
       setFilteredRepos([]);
@@ -83,27 +91,17 @@ export default function ContentApp() {
         <>
           {dataLoaded && searchQuery && filteredRepos.length > 0 && (
             <div className='repos'>
-            {filteredRepos.map((repo, index) => {
-              // Skip the first text description if it's at index 0
-              if (index === 0 && repo.type === 'text') return null;
-          
-              // Only render if the item is a link
-              if (repo.type === 'link') {
-                // Find the next text description, if available
-                const nextItem = filteredRepos[index + 1];
-                const description = nextItem && nextItem.type === 'text' ? nextItem.text : '';
-          
-                return (
-                  <div className='outerdiv' key={index}>
-                    <div className='innerdiv'><a className='linkrepo' href={repo.href} target="_blank" rel="noopener noreferrer">{repo.text}</a>
-                    {description && <p className='descriptionrepo'>{description}</p>}
-                  </div></div>
-                );
-              }
-              return null;
-            })}
-          </div>
-          
+              {filteredRepos.map((repo, index) => (
+                <div className='outerdiv' key={index}>
+                  <div className='innerdiv'>
+                    <a className='linkrepo' href={repo.link.href} target="_blank" rel="noopener noreferrer">
+                      {repo.link.text}
+                    </a>
+                    {repo.description && <p className='descriptionrepo'>{repo.description}</p>}
+                  </div>
+                </div>
+              ))}
+            </div>
           )}
           {dataLoaded && searchQuery && filteredRepos.length === 0 && (
             <p>No repositories match the search criteria.</p>
