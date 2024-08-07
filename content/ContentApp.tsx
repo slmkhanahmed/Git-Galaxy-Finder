@@ -96,7 +96,7 @@ export default function ContentApp() {
                   <div className='innerdiv'>
                     <a className='linkrepo' href={repo.link.href} target="_blank" rel="noopener noreferrer">
                       {repo.link.text}
-                    </a>
+                    </a><hr />
                     {repo.description && <p className='descriptionrepo'>{repo.description}</p>}
                   </div>
                 </div>

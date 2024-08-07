@@ -4,7 +4,7 @@
   position: absolute;
   height: auto;
   min-height: 44cm;
-  background-color: rgb(186, 217, 13);
+  background-color: #0d1117;
   z-index: 2;
 }
 
@@ -13,15 +13,21 @@
 }
 
 .outerdiv {
-  padding: 9px;
+  padding: opx;
 }
 
 .innerdiv {
-  background-color: rgb(144, 43, 43);
+  background-color: #0d1117;
   z-index: 3;
 
 }
 
-.linkrepo {}
+.linkrepo {
+  font-size: 1.5rem;
+  color: #3c82dc;
+}
 
-.descriptionrepo {}
+.descriptionrepo {
+  color: #808993;
+  font-size: 1.2em;
+}
