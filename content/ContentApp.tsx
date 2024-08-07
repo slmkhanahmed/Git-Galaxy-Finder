@@ -62,6 +62,16 @@ export default function ContentApp() {
     } else if (dataLoaded) {
       setFilteredRepos([]);
     }
+
+    // Show or hide the repo list based on the search query
+    const repoListElement = document.getElementById('user-list-repositories');
+    if (repoListElement) {
+      if (searchQuery.trim() === '') {
+        repoListElement.style.display = 'block';
+      } else {
+        repoListElement.style.display = 'none';
+      }
+    }
   }, [searchQuery, repos, dataLoaded]);
 
   const handleSearchChange = (e) => {

@@ -83,12 +83,11 @@ async function fetchAndParseAllPages() {
     } 
 }
 
-
 function getCurrentPath() {
   return window.location.href;
 }
 
- function initial() {
+function initial() {
   const currentUrl = getCurrentPath();
   const savedUrl = localStorage.getItem('lastVisitedUrl');
   // If the current URL matches the pattern
@@ -103,6 +102,7 @@ function getCurrentPath() {
     localStorage.setItem('lastVisitedUrl', currentUrl);
     fetchAndParseAllPages(); // Re-fetch data for the new URL
   } else return null;
+
   const rootDiv = document.createElement('div');
   rootDiv.id = 'my-extension-root';
   const root = ReactDOM.createRoot(rootDiv);
@@ -119,23 +119,20 @@ function getCurrentPath() {
 }
 
 function observeUrlChanges() {
-    let lastUrl = getCurrentPath();
-  
-    const observer = new MutationObserver(() => {
-      const newUrl = getCurrentPath();
-      if (newUrl !== lastUrl) {
-        lastUrl = newUrl;
-        if (urlPattern.test(newUrl)) {
-          initial();
-        } 
-      }
-    });
-  
-    observer.observe(document.body, { childList: true, subtree: true });
-  }
+  let lastUrl = getCurrentPath();
 
+  const observer = new MutationObserver(() => {
+    const newUrl = getCurrentPath();
+    if (newUrl !== lastUrl) {
+      lastUrl = newUrl;
+      if (urlPattern.test(newUrl)) {
+        initial();
+      } 
+    }
+  });
 
-
+  observer.observe(document.body, { childList: true, subtree: true });
+}
 
 setTimeout(initial, 1000);
 observeUrlChanges();
