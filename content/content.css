@@ -4,10 +4,24 @@
   position: absolute;
   height: auto;
   min-height: 44cm;
-  background-color: blue;
+  background-color: rgb(186, 217, 13);
   z-index: 2;
 }
 
 .search {
   z-index: 2;
 }
+
+.outerdiv {
+  padding: 9px;
+}
+
+.innerdiv {
+  background-color: rgb(144, 43, 43);
+  z-index: 3;
+
+}
+
+.linkrepo {}
+
+.descriptionrepo {}

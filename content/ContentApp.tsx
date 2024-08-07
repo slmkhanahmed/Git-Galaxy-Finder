@@ -83,16 +83,27 @@ export default function ContentApp() {
         <>
           {dataLoaded && searchQuery && filteredRepos.length > 0 && (
             <div className='repos'>
-              {filteredRepos.map((repo, index) => (
-                <div key={index}>
-                  {repo.type === 'link' ? (
-                    <a href={repo.href} target="_blank" rel="noopener noreferrer">{repo.text}</a>
-                  ) : (
-                    <p>{repo.text}</p>
-                  )}
-                </div>
-              ))}
-            </div>
+            {filteredRepos.map((repo, index) => {
+              // Skip the first text description if it's at index 0
+              if (index === 0 && repo.type === 'text') return null;
+          
+              // Only render if the item is a link
+              if (repo.type === 'link') {
+                // Find the next text description, if available
+                const nextItem = filteredRepos[index + 1];
+                const description = nextItem && nextItem.type === 'text' ? nextItem.text : '';
+          
+                return (
+                  <div className='outerdiv' key={index}>
+                    <div className='innerdiv'><a className='linkrepo' href={repo.href} target="_blank" rel="noopener noreferrer">{repo.text}</a>
+                    {description && <p className='descriptionrepo'>{description}</p>}
+                  </div></div>
+                );
+              }
+              return null;
+            })}
+          </div>
+          
           )}
           {dataLoaded && searchQuery && filteredRepos.length === 0 && (
             <p>No repositories match the search criteria.</p>
