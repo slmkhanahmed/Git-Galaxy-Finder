@@ -76,16 +76,11 @@ async function fetchAndParseAllPages() {
             allResults = pageResults.flat();
             localStorage.setItem('githubLinks', JSON.stringify(allResults));
 
-            console.log(`Total repository count: ${repoCount}`);
-            console.log(`Total pages processed: ${totalPages}`);
-
-            return { allResults, repoCount, totalPages };
+            return { allResults };
         } catch (error) {
             console.error('Fetch error:', error);
         }
-    } else {
-        console.log("URL does not match pattern");
-    }
+    } 
 }
 
 
@@ -135,9 +130,7 @@ function observeUrlChanges() {
         lastUrl = newUrl;
         if (urlPattern.test(newUrl)) {
           initial();
-        } else {
-          console.log("URL does not match pattern, skipping initialization.");
-        }
+        } 
       }
     });
   
