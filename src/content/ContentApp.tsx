@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import './content.css';
+import { useEffect, useState } from "react";
+import "./content.css";
 
 const POLLING_INTERVAL = 1000;
 
 export default function ContentApp() {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [repos, setRepos] = useState([]);
   const [filteredRepos, setFilteredRepos] = useState([]);
   const [dataLoaded, setDataLoaded] = useState(false);
@@ -13,8 +13,8 @@ export default function ContentApp() {
 
   useEffect(() => {
     const checkData = () => {
-      const storedSearchQuery = localStorage.getItem('searchQuery');
-      const storedRepos = JSON.parse(localStorage.getItem('githubLinks'));
+      const storedSearchQuery = localStorage.getItem("searchQuery");
+      const storedRepos = JSON.parse(localStorage.getItem("githubLinks"));
 
       if (storedRepos) {
         setRepos(storedRepos);
@@ -48,13 +48,20 @@ export default function ContentApp() {
       const lowerCaseQuery = searchQuery.toLowerCase();
       const filtered = [];
       for (let i = 0; i < repos.length; i++) {
-        const linkText = repos[i].type === 'link' ? repos[i].text.toLowerCase() : '';
-        const descriptionText = repos[i + 1] && repos[i + 1].type === 'text' ? repos[i + 1].text.toLowerCase() : '';
+        const linkText =
+          repos[i].type === "link" ? repos[i].text.toLowerCase() : "";
+        const descriptionText =
+          repos[i + 1] && repos[i + 1].type === "text"
+            ? repos[i + 1].text.toLowerCase()
+            : "";
 
-        if (linkText.includes(lowerCaseQuery) || descriptionText.includes(lowerCaseQuery)) {
+        if (
+          linkText.includes(lowerCaseQuery) ||
+          descriptionText.includes(lowerCaseQuery)
+        ) {
           filtered.push({
             link: repos[i],
-            description: descriptionText ? repos[i + 1].text : ''
+            description: descriptionText ? repos[i + 1].text : "",
           });
         }
       }
@@ -64,12 +71,12 @@ export default function ContentApp() {
     }
 
     // Show or hide the repo list based on the search query
-    const repoListElement = document.getElementById('user-list-repositories');
+    const repoListElement = document.getElementById("user-list-repositories");
     if (repoListElement) {
-      if (searchQuery.trim() === '') {
-        repoListElement.style.display = 'block';
+      if (searchQuery.trim() === "") {
+        repoListElement.style.display = "block";
       } else {
-        repoListElement.style.display = 'none';
+        repoListElement.style.display = "none";
       }
     }
   }, [searchQuery, repos, dataLoaded]);
@@ -77,37 +84,52 @@ export default function ContentApp() {
   const handleSearchChange = (e) => {
     const query = e.target.value;
     setSearchQuery(query);
-    localStorage.setItem('searchQuery', query);
+    localStorage.setItem("searchQuery", query);
   };
 
   return (
     <div>
-      <form id='searchstar' onSubmit={(e) => e.preventDefault()}>
-        <label hidden htmlFor="search">Search:</label>
+      <form id="searchstar" onSubmit={(e) => e.preventDefault()}>
+        <label hidden htmlFor="search">
+          Search:
+        </label>
         <input
           id="search"
-          placeholder='Search Stars Repo'
+          placeholder="Search Stars Repo"
           type="search"
           value={searchQuery}
           onChange={handleSearchChange}
           disabled={!dataLoaded}
         />
-        <button type="submit" disabled={!dataLoaded}>Search</button>
+        <button type="submit" disabled={!dataLoaded}>
+          Search
+        </button>
       </form>
 
       {dataNotAvailable ? (
-        <p>No data available in localStorage. Please ensure that 'githubLinks' data is stored correctly.</p>
+        <p>
+          No data available in localStorage. Please ensure that 'githubLinks'
+          data is stored correctly.
+        </p>
       ) : (
         <>
           {dataLoaded && searchQuery && filteredRepos.length > 0 && (
-            <div className='repos'>
+            <div className="repos">
               {filteredRepos.map((repo, index) => (
-                <div className='outerdiv' key={index}>
-                  <div className='innerdiv'>
-                    <a className='linkrepo' href={repo.link.href} target="_blank" rel="noopener noreferrer">
+                <div className="outerdiv" key={index}>
+                  <div className="innerdiv">
+                    <a
+                      className="linkrepo"
+                      href={repo.link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       {repo.link.text}
                     </a>
-                    {repo.description && <p className='descriptionrepo'>{repo.description}</p>}<hr />
+                    {repo.description && (
+                      <p className="descriptionrepo">{repo.description}</p>
+                    )}
+                    <hr />
                   </div>
                 </div>
               ))}
