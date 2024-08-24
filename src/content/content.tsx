@@ -114,21 +114,27 @@ function initial() {
     fetchAndParseAllPages(); // Re-fetch data for the new URL
   } else return null;
 
-  const rootDiv = document.createElement("div");
-  rootDiv.id = "my-extension-root";
-  const root = ReactDOM.createRoot(rootDiv);
+  const contentDiv = document.createElement("div");
+  contentDiv.id = "my-extension-root";
+  const root = ReactDOM.createRoot(contentDiv);
 
   const xeval = new XPathEvaluator();
-  const res = xeval.evaluate(
-    `//*[@id="user-list-repositories"]`,
-    document.body,
-  );
-  const beforeSearch = res.iterateNext();
-  const beforeSearchParent = beforeSearch?.parentNode;
+  let res = xeval.evaluate(`//*[@id="user-list-repositories"]`, document.body);
+  const userListRepositories = res.iterateNext();
+  const dataHpc = userListRepositories?.parentNode;
 
-  if (beforeSearchParent) {
-    beforeSearchParent.insertBefore(rootDiv, beforeSearch);
+  res = xeval.evaluate(`//*[@id="my-extension-root"]`, document.body);
+
+  const previousContent = res.iterateNext();
+
+  if (previousContent) {
+    dataHpc?.removeChild(previousContent);
   }
+
+  if (dataHpc) {
+    dataHpc.insertBefore(contentDiv, userListRepositories);
+  }
+
   root.render(<ContentApp />);
 }
 
