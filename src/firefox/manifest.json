@@ -10,13 +10,15 @@
     "https://github.com/*"
   ],
   "background": {
-    "service_worker": "./background.ts"
+    "scripts": [
+      "../background.ts"
+    ]
   },
   "action": {
-    "default_popup": "src/popup/popup.html",
+    "default_popup": "../popup/popup.html",
     "default_icon": {
-      "16": "icon/icon_16.png",
-      "48": "icon/icon_48.png"
+      "16": "../icon/icon_16.png",
+      "48": "../icon/icon_48.png"
     }
   },
   "content_scripts": [
@@ -26,12 +28,12 @@
         "https://github.com/*?tab=stars"
       ],
       "js": [
-        "./src/content/content.tsx"
+        "../content/content.tsx"
       ]
     }
   ],
   "icons": {
-    "16": "icon/icon_16.png",
-    "48": "icon/icon_48.png"
+    "16": "../icon/icon_16.png",
+    "48": "../icon/icon_48.png"
   }
 }
