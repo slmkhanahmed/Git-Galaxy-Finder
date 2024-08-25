@@ -10,7 +10,7 @@ async function fetchWithRetry(
 ) {
   for (let i = 0; i < retries; i++) {
     try {
-      let response = await fetch(url, options);
+      const response = await fetch(url, options);
       if (!response.ok)
         throw new Error(`HTTP error! status: ${response.status}`);
       return await response.text();
@@ -31,13 +31,14 @@ async function fetchAndParseAllPages() {
 
   if (urlPattern.test(currentUrl)) {
     try {
-      let text = await fetchWithRetry(currentUrl);
-      let parser = new DOMParser();
-      let dom = parser.parseFromString(text, "text/html");
-      let elements = dom.querySelectorAll(
+      const text = await fetchWithRetry(currentUrl);
+      if (!text) return;
+      const parser = new DOMParser();
+      const dom = parser.parseFromString(text, "text/html");
+      const elements = dom.querySelectorAll(
         ".mb-1 a, .pr-4, .my-3 .color-fg-muted",
       );
-      let arr = Array.from(elements);
+      const arr = Array.from(elements);
 
       let repoCount = 0;
       if (arr.length > 0) {
@@ -48,18 +49,19 @@ async function fetchAndParseAllPages() {
         }
       }
 
-      let totalPages = Math.ceil(repoCount / 30);
+      const totalPages = Math.ceil(repoCount / 30);
       let allResults = [];
-      let pagePromises = [];
+      const pagePromises = [];
       for (let page = 1; page <= totalPages; page++) {
         const pageUrl = `${currentUrl}?page=${page}`;
         pagePromises.push(
           fetchWithRetry(pageUrl).then((text) => {
-            let dom = parser.parseFromString(text, "text/html");
-            let elements = dom.querySelectorAll(
+            if (!text) return;
+            const dom = parser.parseFromString(text, "text/html");
+            const elements = dom.querySelectorAll(
               ".mb-1 a, .pr-4, .my-3 .color-fg-muted",
             );
-            let arr = Array.from(elements);
+            const arr = Array.from(elements);
             if (page > 1 && arr.length > 0) {
               arr.shift();
             }
@@ -83,7 +85,7 @@ async function fetchAndParseAllPages() {
         );
       }
 
-      let pageResults = await Promise.all(pagePromises);
+      const pageResults = await Promise.all(pagePromises);
       allResults = pageResults.flat();
       localStorage.setItem("githubLinks", JSON.stringify(allResults));
 

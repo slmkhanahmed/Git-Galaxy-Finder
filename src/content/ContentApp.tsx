@@ -1,12 +1,20 @@
-import { useEffect, useState } from "react";
+import { ChangeEventHandler, useEffect, useState } from "react";
 import "./content.css";
 
 const POLLING_INTERVAL = 1000;
-
+interface Repo {
+  type: string;
+  text: string;
+  href: string;
+}
+interface FilteredRepo {
+  link: Repo;
+  description: string;
+}
 export default function ContentApp() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [repos, setRepos] = useState([]);
-  const [filteredRepos, setFilteredRepos] = useState([]);
+  const [repos, setRepos] = useState<Repo[]>([]);
+  const [filteredRepos, setFilteredRepos] = useState<FilteredRepo[]>([]);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [dataNotAvailable, setDataNotAvailable] = useState(true);
   const [polling, setPolling] = useState(true);
@@ -14,7 +22,9 @@ export default function ContentApp() {
   useEffect(() => {
     const checkData = () => {
       const storedSearchQuery = localStorage.getItem("searchQuery");
-      const storedRepos = JSON.parse(localStorage.getItem("githubLinks"));
+      let storedRepos;
+      const githubLinks = localStorage.getItem("githubLinks");
+      if (githubLinks) storedRepos = JSON.parse(githubLinks) as Repo[];
 
       if (storedRepos) {
         setRepos(storedRepos);
@@ -81,7 +91,7 @@ export default function ContentApp() {
     }
   }, [searchQuery, repos, dataLoaded]);
 
-  const handleSearchChange = (e) => {
+  const handleSearchChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     const query = e.target.value;
     setSearchQuery(query);
     localStorage.setItem("searchQuery", query);
@@ -89,7 +99,17 @@ export default function ContentApp() {
 
   return (
     <div>
-      <form id="searchstar" onSubmit={(e) => e.preventDefault()}>
+      <form
+        id="searchstar"
+        onSubmit={(e) => {
+          e.preventDefault();
+          const form = e.target;
+          //@ts-ignore
+          const query = form.search.value;
+          setSearchQuery(query);
+          localStorage.setItem("searchQuery", query);
+        }}
+      >
         <label hidden htmlFor="search">
           Search:
         </label>
