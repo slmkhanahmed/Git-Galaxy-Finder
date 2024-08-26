@@ -140,21 +140,32 @@ function initial() {
   root.render(<ContentApp />);
 }
 
-function observeUrlChanges() {
-  let lastUrl = getCurrentPath();
+// function observeUrlChanges() {
+//   let lastUrl = getCurrentPath();
 
-  const observer = new MutationObserver(() => {
-    const newUrl = getCurrentPath();
-    if (newUrl !== lastUrl) {
-      lastUrl = newUrl;
-      if (urlPattern.test(newUrl)) {
-        initial();
-      }
-    }
-  });
+//   const observer = new MutationObserver(() => {
+//     const newUrl = getCurrentPath();
+//     console.log("Body changed.");
+//     if (newUrl !== lastUrl) {
+//       lastUrl = newUrl;
+//       if (urlPattern.test(newUrl)) {
+//         initial();
+//       }
+//     }
+//   });
 
-  observer.observe(document.body, { childList: true, subtree: true });
-}
+//   observer.observe(document.body, { childList: true, subtree: true });
+// }
+// @ts-ignore
+window.navigation.addEventListener("navigate", () => {
+  console.log("navigated.");
+  const newUrl = getCurrentPath();
+  console.log("new url: ", newUrl);
+  if (urlPattern.test(newUrl)) {
+    console.log("url matched.");
+    initial();
+  }
+});
 
 setTimeout(initial, 1000);
-observeUrlChanges();
+// observeUrlChanges();
