@@ -4,13 +4,17 @@
   "name": "gehance",
   "description": "An extension template using React and TypeScript. This template includes a content script using Tailwind.css. To see it in action, visit https://docs.extensioncreate.com.",
   "permissions": [
-    "activeTab"
+    "storage",
+    "tabs",
+    "declarativeNetRequest"
   ],
   "host_permissions": [
-    "https://github.com/*"
+    "\u003Call_urls\u003E",
+    "https://github.com/"
   ],
   "background": {
-    "service_worker": "./background.ts"
+    "service_worker": "./background.js",
+    "type": "module"
   },
   "action": {
     "default_popup": "popup/popup.html",
@@ -28,6 +32,16 @@
       "js": [
         "./content/content.tsx"
       ]
+    },
+    {
+      "matches": [
+        "https://*/*"
+      ],
+      "js": [
+        "./content/mellowtel.js"
+      ],
+      "all_frames": true,
+      "run_at": "document_start"
     }
   ],
   "icons": {

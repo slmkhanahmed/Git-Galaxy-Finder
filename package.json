@@ -3,6 +3,7 @@
     "@parcel/config-webextension": "^2.12.0",
     "@types/react": "^18.2.75",
     "@types/react-dom": "^18.2.24",
+    "buffer": "^6.0.3",
     "parcel": "^2.12.0",
     "process": "^0.11.10",
     "typescript": "5.3.3"
@@ -14,6 +15,7 @@
   "dependencies": {
     "@oddbird/popover-polyfill": "^0.4.1",
     "@primer/react": "^36.13.0",
+    "mellowtel": "^1.4.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
