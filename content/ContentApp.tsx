@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './content.css';
+type Theme = 'dark' | 'light';
 
 const POLLING_INTERVAL = 1000;
 
@@ -10,7 +11,22 @@ export default function ContentApp() {
   const [dataLoaded, setDataLoaded] = useState(false);
   const [dataNotAvailable, setDataNotAvailable] = useState(true);
   const [polling, setPolling] = useState(true);
+// Add theme state
+const [theme, setTheme] = useState<Theme>(() => {
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme) return savedTheme as Theme;
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+});
 
+// Add theme toggle effect
+useEffect(() => {
+  localStorage.setItem('theme', theme);
+  document.documentElement.setAttribute('data-theme', theme);
+}, [theme]);
+
+const toggleTheme = () => {
+  setTheme(prev => prev === 'dark' ? 'light' : 'dark');
+};
   useEffect(() => {
     const checkData = () => {
       const storedSearchQuery = localStorage.getItem('searchQuery');
@@ -81,43 +97,62 @@ export default function ContentApp() {
   };
 
   return (
-    <div>
-      <form id='searchstar' onSubmit={(e) => e.preventDefault()}>
-        <label hidden htmlFor="search">Search:</label>
+    <div data-theme={theme}>
+      <form id="searchstar" onSubmit={(e) => e.preventDefault()}>
         <input
           id="search"
-          placeholder='Search Stars Repo'
+          placeholder="Search Stars Repo"
           type="search"
           value={searchQuery}
           onChange={handleSearchChange}
           disabled={!dataLoaded}
         />
-        <button type="submit" disabled={!dataLoaded}>Search</button>
+        <button type="submit" disabled={!dataLoaded}>
+          Search
+        </button>
+        <button
+          type="button"
+          onClick={toggleTheme}
+          className="theme-toggle"
+          title="Toggle theme"
+        >
+          {theme === "dark" ? "🌞" : "🌛"}
+        </button>
       </form>
-
+  
       {dataNotAvailable ? (
-        <p>No data available in localStorage. Please ensure that 'githubLinks' data is stored correctly.</p>
+        <div className="data-message">
+          No data available in localStorage. Please ensure 'githubLinks' data is stored correctly.
+        </div>
       ) : (
         <>
           {dataLoaded && searchQuery && filteredRepos.length > 0 && (
-            <div className='repos'>
+            <div className="repos">
               {filteredRepos.map((repo, index) => (
-                <div className='outerdiv' key={index}>
-                  <div className='innerdiv'>
-                    <a className='linkrepo' href={repo.link.href} target="_blank" rel="noopener noreferrer">
+                <div className="outerdiv" key={index}>
+                  <div className="innerdiv">
+                    <a
+                      className="linkrepo"
+                      href={repo.link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
                       {repo.link.text}
                     </a>
-                    {repo.description && <p className='descriptionrepo'>{repo.description}</p>}<hr />
+                    {repo.description && (
+                      <p className="descriptionrepo">{repo.description}</p>
+                    )}
                   </div>
                 </div>
               ))}
             </div>
           )}
           {dataLoaded && searchQuery && filteredRepos.length === 0 && (
-            <p>No repositories match the search criteria.</p>
+            <div className="no-results">
+              No repositories match the search criteria.
+            </div>
           )}
         </>
       )}
     </div>
   );
-}
