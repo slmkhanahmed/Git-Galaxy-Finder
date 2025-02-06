@@ -129,8 +129,8 @@ button:hover {
   background: var(--hover-bg);
 }
 
-/* Highlight class for matched text */
+/* Highlight class */
 .highlight {
-  background-color: yellow;
-  color: inherit;
+  background-color: rgb(255, 255, 0);
+  font-weight: bold;
 }

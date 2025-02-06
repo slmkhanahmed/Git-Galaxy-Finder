@@ -1,87 +1,87 @@
-// content.tsx
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import ContentApp from './ContentApp';
 
 const urlPattern = /https:\/\/github.com\/stars\/.*\/lists\/.*/;
 
-async function fetchWithRetry(url: string, options = {}, retries = 3, backoff = 3000): Promise<string> {
-  for (let i = 0; i < retries; i++) {
-    try {
-      let response = await fetch(url, options);
-      if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-      return await response.text();
-    } catch (error) {
-      console.error(`Fetch error on attempt ${i + 1} for URL: ${url}`, error);
-      if (i < retries - 1) {
-        console.log(`Retrying in ${backoff / 1000} seconds...`);
-        await new Promise(resolve => setTimeout(resolve, backoff));
-      } else {
-        throw error;
-      }
+async function fetchWithRetry(url, options = {}, retries = 3, backoff = 3000) {
+    for (let i = 0; i < retries; i++) {
+        try {
+            let response = await fetch(url, options);
+            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+            return await response.text();
+        } catch (error) {
+            console.error(`Fetch error on attempt ${i + 1} for URL: ${url}`, error);
+            if (i < retries - 1) {
+                console.log(`Retrying in ${backoff / 1000} seconds...`);
+                await new Promise(resolve => setTimeout(resolve, backoff));
+            } else {
+                throw error;
+            }
+        }
     }
-  }
-  throw new Error('Unable to fetch after retries');
 }
 
 async function fetchAndParseAllPages() {
-  const currentUrl = window.location.href;
-  if (urlPattern.test(currentUrl)) {
-    try {
-      let text = await fetchWithRetry(currentUrl);
-      let parser = new DOMParser();
-      let dom = parser.parseFromString(text, 'text/html');
-      let elements = dom.querySelectorAll('.mb-1 a, .pr-4, .my-3 .color-fg-muted');
-      let arr = Array.from(elements);
-      
-      let repoCount = 0;
-      if (arr.length > 0) {
-        const repoText = arr[0].textContent?.trim() || '';
-        const repoMatch = repoText.match(/(\d+)\s+repositories/i);
-        if (repoMatch) {
-          repoCount = parseInt(repoMatch[1].replace(/\./g, ''), 10);
-        }
-      }
+    const currentUrl = window.location.href;
 
-      let totalPages = Math.ceil(repoCount / 30);
-      let allResults: any[] = [];
-      let pagePromises = [];
-      for (let page = 1; page <= totalPages; page++) {
-        const pageUrl = `${currentUrl}?page=${page}`;
-        pagePromises.push(
-          fetchWithRetry(pageUrl).then(text => {
+    if (urlPattern.test(currentUrl)) {
+        try {
+            let text = await fetchWithRetry(currentUrl);
+            let parser = new DOMParser();
             let dom = parser.parseFromString(text, 'text/html');
             let elements = dom.querySelectorAll('.mb-1 a, .pr-4, .my-3 .color-fg-muted');
             let arr = Array.from(elements);
-            if (page > 1 && arr.length > 0) {
-              arr.shift();
+            
+            let repoCount = 0;
+            if (arr.length > 0) {
+                const repoText = arr[0].textContent?.trim() || '';
+                const repoMatch = repoText.match(/(\d+)\s+repositories/i);
+                if (repoMatch) {
+                    repoCount = parseInt(repoMatch[1].replace(/\./g, ''), 10);
+                }
             }
-            return arr.map(e => {
-              if (e instanceof HTMLAnchorElement) {
-                return {
-                  type: 'link',
-                  text: e.innerText,
-                  href: e.href
-                };
-              } else {
-                return {
-                  type: 'text',
-                  text: e.textContent?.trim() || ''
-                };
-              }
-            }).filter(result => result.text);
-          })
-        );
-      }
 
-      let pageResults = await Promise.all(pagePromises);
-      allResults = pageResults.flat();
-      localStorage.setItem('githubLinks', JSON.stringify(allResults));
-      return { allResults };
-    } catch (error) {
-      console.error('Fetch error:', error);
-    }
-  }
+            let totalPages = Math.ceil(repoCount / 30);
+            let allResults = [];
+            let pagePromises = [];
+            for (let page = 1; page <= totalPages; page++) {
+                const pageUrl = `${currentUrl}?page=${page}`;
+                pagePromises.push(
+                    fetchWithRetry(pageUrl).then(text => {
+                        let dom = parser.parseFromString(text, 'text/html');
+                        let elements = dom.querySelectorAll('.mb-1 a, .pr-4, .my-3 .color-fg-muted');
+                        let arr = Array.from(elements);
+                        if (page > 1 && arr.length > 0) {
+                            arr.shift();
+                        }
+                        return arr.map(e => {
+                            if (e instanceof HTMLAnchorElement) {
+                                return {
+                                    type: 'link',
+                                    text: e.innerText,
+                                    href: e.href
+                                };
+                            } else {
+                                return {
+                                    type: 'text',
+                                    text: e.textContent?.trim() || ''
+                                };
+                            }
+                        }).filter(result => result.text);
+                    })
+                );
+            }
+
+            let pageResults = await Promise.all(pagePromises);
+            allResults = pageResults.flat();
+            localStorage.setItem('githubLinks', JSON.stringify(allResults));
+
+            return { allResults };
+        } catch (error) {
+            console.error('Fetch error:', error);
+        }
+    } 
 }
 
 function getCurrentPath() {
@@ -110,21 +110,23 @@ function initial() {
 
   if (beforeSearchParent) {
     beforeSearchParent.insertBefore(rootDiv, beforeSearch);
-  }
+  } 
   root.render(<ContentApp />);
 }
 
 function observeUrlChanges() {
   let lastUrl = getCurrentPath();
+
   const observer = new MutationObserver(() => {
     const newUrl = getCurrentPath();
     if (newUrl !== lastUrl) {
       lastUrl = newUrl;
       if (urlPattern.test(newUrl)) {
         initial();
-      }
+      } 
     }
   });
+
   observer.observe(document.body, { childList: true, subtree: true });
 }
 

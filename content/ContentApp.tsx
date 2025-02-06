@@ -1,14 +1,14 @@
-// ContentApp.tsx
 import React, { useState, useEffect } from 'react';
 import './content.css';
 
 type Theme = 'dark' | 'light';
+
 const POLLING_INTERVAL = 1000;
 
 export default function ContentApp() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [repos, setRepos] = useState<any[]>([]);
-  const [filteredRepos, setFilteredRepos] = useState<any[]>([]);
+  const [repos, setRepos] = useState([]);
+  const [filteredRepos, setFilteredRepos] = useState([]);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [dataNotAvailable, setDataNotAvailable] = useState(true);
   const [polling, setPolling] = useState(true);
@@ -18,33 +18,41 @@ export default function ContentApp() {
     return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   });
 
-  // Update theme in localStorage and document
+  // Highlight text utility function
+  const highlightText = (text: string, query: string) => {
+    if (!query) return text;
+
+    const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(${escapedQuery})`, 'gi');
+    const parts = text.split(regex);
+
+    return parts.map((part, index) => {
+      if (regex.test(part)) {
+        return (
+          <span key={index} className="highlight">
+            {part}
+          </span>
+        );
+      }
+      return part;
+    });
+  };
+
+  // Theme toggle effect
   useEffect(() => {
     localStorage.setItem('theme', theme);
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
 
   const toggleTheme = () => {
-    setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
   };
 
-  // Utility function to escape special regex characters
-  function escapeRegExp(string: string) {
-    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  }
-
-  // Utility function to wrap matching parts of text in a span with the highlight class
-  function highlight(text: string, query: string): string {
-    if (!query) return text;
-    const escapedQuery = escapeRegExp(query);
-    const regex = new RegExp(`(${escapedQuery})`, 'gi');
-    return text.replace(regex, '<span class="highlight">$1</span>');
-  }
-
+  // Data polling effect
   useEffect(() => {
     const checkData = () => {
-      const storedSearchQuery = localStorage.getItem('searchQuery') || '';
-      const storedRepos = JSON.parse(localStorage.getItem('githubLinks') || 'null');
+      const storedSearchQuery = localStorage.getItem('searchQuery');
+      const storedRepos = JSON.parse(localStorage.getItem('githubLinks'));
 
       if (storedRepos) {
         setRepos(storedRepos);
@@ -55,7 +63,9 @@ export default function ContentApp() {
         setDataNotAvailable(true);
       }
 
-      setSearchQuery(storedSearchQuery);
+      if (storedSearchQuery) {
+        setSearchQuery(storedSearchQuery);
+      }
     };
 
     checkData();
@@ -71,10 +81,11 @@ export default function ContentApp() {
     return () => clearInterval(intervalId);
   }, [polling]);
 
+  // Filter repos based on search query
   useEffect(() => {
     if (dataLoaded && searchQuery) {
       const lowerCaseQuery = searchQuery.toLowerCase();
-      const filtered: { link: any; description: string }[] = [];
+      const filtered = [];
       for (let i = 0; i < repos.length; i++) {
         const linkText = repos[i].type === 'link' ? repos[i].text.toLowerCase() : '';
         const descriptionText =
@@ -83,7 +94,7 @@ export default function ContentApp() {
         if (linkText.includes(lowerCaseQuery) || descriptionText.includes(lowerCaseQuery)) {
           filtered.push({
             link: repos[i],
-            description: descriptionText ? repos[i + 1].text : ''
+            description: descriptionText ? repos[i + 1].text : '',
           });
         }
       }
@@ -92,14 +103,18 @@ export default function ContentApp() {
       setFilteredRepos([]);
     }
 
-    // Toggle the display of the repo list based on the search query
+    // Show or hide the repo list based on the search query
     const repoListElement = document.getElementById('user-list-repositories');
     if (repoListElement) {
-      repoListElement.style.display = searchQuery.trim() === '' ? 'block' : 'none';
+      if (searchQuery.trim() === '') {
+        repoListElement.style.display = 'block';
+      } else {
+        repoListElement.style.display = 'none';
+      }
     }
   }, [searchQuery, repos, dataLoaded]);
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleSearchChange = (e) => {
     const query = e.target.value;
     setSearchQuery(query);
     localStorage.setItem('searchQuery', query);
@@ -125,7 +140,7 @@ export default function ContentApp() {
           className="theme-toggle"
           title="Toggle theme"
         >
-          {theme === "dark" ? "🌞" : "🌛"}
+          {theme === 'dark' ? '🌞' : '🌛'}
         </button>
       </form>
 
@@ -145,17 +160,13 @@ export default function ContentApp() {
                       href={repo.link.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      dangerouslySetInnerHTML={{
-                        __html: highlight(repo.link.text, searchQuery)
-                      }}
-                    />
+                    >
+                      {highlightText(repo.link.text, searchQuery)}
+                    </a>
                     {repo.description && (
-                      <p
-                        className="descriptionrepo"
-                        dangerouslySetInnerHTML={{
-                          __html: highlight(repo.description, searchQuery)
-                        }}
-                      />
+                      <p className="descriptionrepo">
+                        {highlightText(repo.description, searchQuery)}
+                      </p>
                     )}
                   </div>
                 </div>
