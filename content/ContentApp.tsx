@@ -1,36 +1,50 @@
+// ContentApp.tsx
 import React, { useState, useEffect } from 'react';
 import './content.css';
-type Theme = 'dark' | 'light';
 
+type Theme = 'dark' | 'light';
 const POLLING_INTERVAL = 1000;
 
 export default function ContentApp() {
   const [searchQuery, setSearchQuery] = useState('');
-  const [repos, setRepos] = useState([]);
-  const [filteredRepos, setFilteredRepos] = useState([]);
+  const [repos, setRepos] = useState<any[]>([]);
+  const [filteredRepos, setFilteredRepos] = useState<any[]>([]);
   const [dataLoaded, setDataLoaded] = useState(false);
   const [dataNotAvailable, setDataNotAvailable] = useState(true);
   const [polling, setPolling] = useState(true);
-// Add theme state
-const [theme, setTheme] = useState<Theme>(() => {
-  const savedTheme = localStorage.getItem('theme');
-  if (savedTheme) return savedTheme as Theme;
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-});
+  const [theme, setTheme] = useState<Theme>(() => {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) return savedTheme as Theme;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  });
 
-// Add theme toggle effect
-useEffect(() => {
-  localStorage.setItem('theme', theme);
-  document.documentElement.setAttribute('data-theme', theme);
-}, [theme]);
+  // Update theme in localStorage and document
+  useEffect(() => {
+    localStorage.setItem('theme', theme);
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
 
-const toggleTheme = () => {
-  setTheme(prev => prev === 'dark' ? 'light' : 'dark');
-};
+  const toggleTheme = () => {
+    setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
+  };
+
+  // Utility function to escape special regex characters
+  function escapeRegExp(string: string) {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  // Utility function to wrap matching parts of text in a span with the highlight class
+  function highlight(text: string, query: string): string {
+    if (!query) return text;
+    const escapedQuery = escapeRegExp(query);
+    const regex = new RegExp(`(${escapedQuery})`, 'gi');
+    return text.replace(regex, '<span class="highlight">$1</span>');
+  }
+
   useEffect(() => {
     const checkData = () => {
-      const storedSearchQuery = localStorage.getItem('searchQuery');
-      const storedRepos = JSON.parse(localStorage.getItem('githubLinks'));
+      const storedSearchQuery = localStorage.getItem('searchQuery') || '';
+      const storedRepos = JSON.parse(localStorage.getItem('githubLinks') || 'null');
 
       if (storedRepos) {
         setRepos(storedRepos);
@@ -41,9 +55,7 @@ const toggleTheme = () => {
         setDataNotAvailable(true);
       }
 
-      if (storedSearchQuery) {
-        setSearchQuery(storedSearchQuery);
-      }
+      setSearchQuery(storedSearchQuery);
     };
 
     checkData();
@@ -62,10 +74,11 @@ const toggleTheme = () => {
   useEffect(() => {
     if (dataLoaded && searchQuery) {
       const lowerCaseQuery = searchQuery.toLowerCase();
-      const filtered = [];
+      const filtered: { link: any; description: string }[] = [];
       for (let i = 0; i < repos.length; i++) {
         const linkText = repos[i].type === 'link' ? repos[i].text.toLowerCase() : '';
-        const descriptionText = repos[i + 1] && repos[i + 1].type === 'text' ? repos[i + 1].text.toLowerCase() : '';
+        const descriptionText =
+          repos[i + 1] && repos[i + 1].type === 'text' ? repos[i + 1].text.toLowerCase() : '';
 
         if (linkText.includes(lowerCaseQuery) || descriptionText.includes(lowerCaseQuery)) {
           filtered.push({
@@ -79,18 +92,14 @@ const toggleTheme = () => {
       setFilteredRepos([]);
     }
 
-    // Show or hide the repo list based on the search query
+    // Toggle the display of the repo list based on the search query
     const repoListElement = document.getElementById('user-list-repositories');
     if (repoListElement) {
-      if (searchQuery.trim() === '') {
-        repoListElement.style.display = 'block';
-      } else {
-        repoListElement.style.display = 'none';
-      }
+      repoListElement.style.display = searchQuery.trim() === '' ? 'block' : 'none';
     }
   }, [searchQuery, repos, dataLoaded]);
 
-  const handleSearchChange = (e) => {
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
     setSearchQuery(query);
     localStorage.setItem('searchQuery', query);
@@ -119,7 +128,7 @@ const toggleTheme = () => {
           {theme === "dark" ? "🌞" : "🌛"}
         </button>
       </form>
-  
+
       {dataNotAvailable ? (
         <div className="data-message">
           No data available in localStorage. Please ensure 'githubLinks' data is stored correctly.
@@ -136,11 +145,17 @@ const toggleTheme = () => {
                       href={repo.link.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                    >
-                      {repo.link.text}
-                    </a>
+                      dangerouslySetInnerHTML={{
+                        __html: highlight(repo.link.text, searchQuery)
+                      }}
+                    />
                     {repo.description && (
-                      <p className="descriptionrepo">{repo.description}</p>
+                      <p
+                        className="descriptionrepo"
+                        dangerouslySetInnerHTML={{
+                          __html: highlight(repo.description, searchQuery)
+                        }}
+                      />
                     )}
                   </div>
                 </div>
@@ -155,4 +170,5 @@ const toggleTheme = () => {
         </>
       )}
     </div>
-  );}
+  );
+}
