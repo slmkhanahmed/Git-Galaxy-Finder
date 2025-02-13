@@ -1,0 +1,49 @@
+name: Build Extension
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "22.13.0"
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
+
+      - name: Archive Extension with a workflow
+        run: zip -r dist/gehance.zip dist/*
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ./dist/gehance.zip
+          token: ${{ secrets.GITHUB_TOKEN }}
+          body: |
+            ## Changelog
+            $(git log --pretty=format:"%h - %s (%an)" ${{ github.event.before }}..${{ github.sha }})
+
+            ## Extension Details
+            - Extension Name: Gehance
+            - Version: ${{ github.sha }}
+            - Build Date: $(date -u)
+            - Browser: chrome, firefox
+            - File Type: zip
+            - File Size: $(du -sh ./dist/*.zip | cut -f1)
+
+            ## Browser Support
+            - Chrome: >= 80
+            - Firefox: >= 80
+            - Edge: >= 80
