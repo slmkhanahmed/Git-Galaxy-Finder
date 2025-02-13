@@ -1,0 +1,67 @@
+name: Build Extension
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "22.13.0"
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Build
+        run: npm run build
+
+      - name: Archive Extension with a workflow
+        run: zip -r dist/gehance.zip dist/*
+
+      - name: Bump version and push tag
+        id: bump
+        uses: anothrNick/github-tag-action@v1 # Don't use @master or @v1 unless you're happy to test the latest version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # if you don't want to set write permissions use a PAT token
+          WITH_V: false
+
+      - name: Generate Release Body
+        id: generate_body
+        run: |
+          echo "## Changelog" > release_body.md
+          git log --pretty=format:"%h - %s (%an)" ${{ github.event.before }}..${{ github.sha }} >> release_body.md
+          echo "" >> release_body.md
+          echo "## Extension Details" >> release_body.md
+          echo "- Extension Name: Gehance" >> release_body.md
+          echo "- Version: ${{ github.sha }}" >> release_body.md
+          echo "- Build Date: $(date -u)" >> release_body.md
+          echo "- Browser: chrome, firefox" >> release_body.md
+          echo "- File Type: zip" >> release_body.md
+          echo "- File Size: $(du -sh ./dist/gehance.zip | cut -f1)" >> release_body.md
+          echo "" >> release_body.md
+          echo "## Browser Support" >> release_body.md
+          echo "- Chrome: >= 80" >> release_body.md
+          echo "- Firefox: >= 80" >> release_body.md
+          echo "- Edge: >= 80" >> release_body.md
+          cat release_body.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ./dist/gehance.zip
+          tag_name: ${{ steps.bump.outputs.new_tag }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          body_path: release_body.md
