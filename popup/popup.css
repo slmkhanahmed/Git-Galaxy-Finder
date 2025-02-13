@@ -1,0 +1,232 @@
+.popup-container {
+    width: 300px;
+    padding: 16px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+}
+
+.login-screen {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.mb-1 {
+    margin-bottom: 0.25rem;
+}
+
+.mb-2 {
+    margin-bottom: 0.5rem;
+}
+
+.github-button {
+    background-color: #2da44e;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    justify-content: center;
+    transition: all 0.2s cubic-bezier(0.3, 0, 0.5, 1);
+    transform: translateY(0);
+}
+
+.github-button:hover {
+    background-color: #2c974b;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+.developer-card {
+    display: flex;
+    gap: 12px;
+    padding: 1rem 0;
+    border-top: 1px solid #e1e4e8;
+    transition: opacity 0.2s ease;
+}
+
+.developer-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 2px solid #e1e4e8;
+    transition: transform 0.3s ease, border-color 0.2s ease;
+}
+
+.developer-avatar:hover {
+    transform: scale(1.05);
+    border-color: #0366d6;
+}
+
+.role {
+    color: #6a737d;
+    font-size: 0.9rem;
+    transition: color 0.2s ease;
+}
+
+.bio {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: #586069;
+    transition: color 0.2s ease;
+}
+
+.expertise {
+    margin: 8px 0;
+    padding-left: 20px;
+    list-style-type: square;
+}
+
+.expertise li {
+    margin: 6px 0;
+    font-size: 0.875rem;
+    position: relative;
+    transition: transform 0.2s ease;
+}
+
+.expertise li:hover {
+    transform: translateX(5px);
+    color: #0366d6;
+}
+
+.profile-links {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.profile-links a {
+    color: #586069;
+    transition: all 0.2s cubic-bezier(0.3, 0, 0.5, 1);
+    display: inline-flex;
+    padding: 4px;
+    border-radius: 6px;
+}
+
+.profile-links a:hover {
+    color: #0366d6;
+    transform: translateY(-2px);
+    background-color: rgba(3, 102, 214, 0.1);
+}
+
+.support-section {
+    background-color: #f6f8fa;
+    padding: 1rem;
+    border-radius: 6px;
+    text-align: center;
+    transition: transform 0.2s ease;
+}
+
+.support-section:hover {
+    transform: translateY(-2px);
+}
+
+.payoneer-button {
+    background-color: #ff4800;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 12px;
+    transition: all 0.2s cubic-bezier(0.3, 0, 0.5, 1);
+}
+
+.payoneer-button:hover {
+    background-color: #ff5c1a;
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(255, 72, 0, 0.2);
+}
+
+@media (prefers-color-scheme: dark) {
+    .popup-container {
+        background-color: #0d1117;
+        color: #c9d1d9;
+    }
+
+    .github-button {
+        background-color: #238636;
+    }
+
+    .github-button:hover {
+        background-color: #2ea043;
+        box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    .developer-card {
+        border-color: #30363d;
+    }
+
+    .developer-avatar:hover {
+        border-color: #58a6ff;
+    }
+
+    .support-section {
+        background-color: #161b22;
+    }
+
+    .role,
+    .bio {
+        color: #8b949e;
+    }
+
+    .expertise li {
+        color: #c9d1d9;
+    }
+
+    .expertise li:hover {
+        color: #58a6ff;
+    }
+
+    .profile-links a {
+        color: #8b949e;
+    }
+
+    .profile-links a:hover {
+        color: #58a6ff;
+        background-color: rgba(88, 166, 255, 0.1);
+    }
+
+    .payoneer-button {
+        background-color: #ff6b35;
+    }
+
+    .payoneer-button:hover {
+        background-color: #ff7d4d;
+        box-shadow: 0 3px 8px rgba(255, 107, 53, 0.3);
+    }
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+}
+
+.popup-container {
+    /* Prevent overflow and account for Chrome's extension frame */
+
+
+    /* Remove outline on focus */
+    outline: none;
+
+    /* Match dark/light theme background */
+    background-color: var(--bg-color, #ffffff);
+}
+
+/* Dark theme adjustment */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-color: #0d1117;
+    }
+}
