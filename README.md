@@ -1,69 +1,28 @@
-# GitHub Stars Search 🌟
+# Git Galaxy Finder
 
-**GitHub Stars Search** is a powerful browser extension that fetches and organizes repositories from your GitHub "stars" folder, offering a searchable interface for instant access. 
+Search repositories by name or description within a GitHub Stars list, right on the list page.
 
-Stop scrolling through endless lists—find the exact repository you need by searching through links and descriptions directly on GitHub.
+## Install in Firefox
 
----
+1. Open the [official Git Galaxy Finder listing on Mozilla Add-ons](https://addons.mozilla.org/en-US/firefox/addon/git-star/) in Firefox and choose **Add to Firefox**. Review the GitHub site-access permission when prompted.
+2. Open a named GitHub Stars list, such as `https://github.com/stars/USERNAME/lists/LIST-NAME`. Sign in on GitHub itself if the list requires it.
+3. Type in the search box on the list page, then select a repository from the results.
 
-## 🚀 What's New in v2.1.0
+Mozilla lists the store add-on for Firefox on desktop and Android. The instructions below are for testing a local checkout in desktop Firefox, not installing the signed store version.
 
-This version represents a complete overhaul of the extension, addressing major issues and introducing new features to enhance your GitHub experience.
+## Build and test this checkout
 
-### New Features
-* **Theme Adaptation:** Respects GitHub's light/dark theme settings for a consistent look.
-* **Real-Time Data Sync:** Search results stay up-to-date with your latest repository data.
-* **Enhanced Feedback:** Added loading states to indicate data fetching/processing.
-* **Improved UI/UX:** Scrollable results container and clear visual separation for better readability.
+With Node.js and npm installed, run these commands from the repository root:
 
-### Bug Fixes 🐛
-* **Persistence:** Search component now persists correctly during navigation and reloads.
-* **Search Optimization:** Functionality fully restored and performance-tuned.
-* **Data Fetching:** Resolved issues with repository data loading or incorrect parsing.
-* **SPA Navigation:** Full support for GitHub's single-page application (SPA) transitions.
+```sh
+npm ci
+npm run build -- --no-autoinstall
+```
 
-### Performance Improvements ⚡
-* **Optimized DOM Handling:** Now waits for GitHub's DOM to fully load before initializing.
-* **Reduced Re-renders:** Improved React component lifecycle management for smoother performance.
-* **Efficient Polling:** Reduced unnecessary network requests while maintaining real-time updates.
+Parcel builds the extension into `dist/`. In a separate desktop Firefox test profile, open `about:debugging` → **This Firefox** → **Load Temporary Add-on**, then choose `dist/manifest.json`. It appears as `gehance` in this checkout. The temporary add-on is removed when Firefox restarts. See [Mozilla’s temporary-install guide](https://extensionworkshop.com/documentation/develop/temporary-installation-in-firefox/).
 
----
+Use `npm start -- --no-autoinstall` for watch mode. After changes build, reload the temporary add-on from **This Firefox**.
 
-## ✨ Features
+## Data in this checkout
 
-* **Searchable Interface:** Filter starred repositories by name or description.
-* **Auto-Update:** Automatically keeps your starred list in sync.
-* **Deep Integration:** Blends seamlessly into the existing GitHub UI.
-* **Fast Browsing:** Optimized for quick lookups even with many starred projects.
-
----
-
-## 🛠️ How to Use
-
-1.  **Install the extension** (Available on Firefox).
-2.  Navigate to any **GitHub Stars list page** (e.g., `https://github.com/stars/username/lists/list-name`).
-3.  The **search bar** will appear automatically at the top of the repository list.
-4.  **Start typing** to filter repositories by name or description.
-5.  **Click on a repository** to open it in a new tab.
-
----
-
-## ⚠️ Known Issues
-
-* **Initial Load Delay:** The extension may take 1-2 seconds to appear on very slow internet connections.
-* **Large Repository Lists:** Searching through extremely large lists (10,000+ repos) may cause slight performance delays during indexing.
-
----
-
-## 🤝 Contributing
-
-If you encounter any issues or have suggestions for new features, please report them via the **Issues** tab. Pull requests are welcome!
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-*Developed to make repository management on GitHub effortless.*
+The search script reads repository links and descriptions from GitHub’s list pages. It stores the parsed results, last list URL, search text, and theme in the browser’s GitHub site storage (`localStorage`). The search doesn’t require a personal access token or its own OAuth login. The development toolbar popup’s sign-in button is a placeholder; use the search on a named GitHub list instead.
